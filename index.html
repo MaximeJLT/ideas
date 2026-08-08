@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Things to do</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+    <!-- Nouvelles Polices : Inter (Architecture/Design) + Space Mono (Tech/ML) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #FDFCF8;
-            --text-color: #1A1A1A;
-            --accent-color: #9E9E9E;
+            --bg-color: #FFFFFF;       /* Blanc pur */
+            --text-color: #111111;     /* Noir profond */
+            --meta-color: #888888;     /* Gris technique */
+            --line-color: #E0E0E0;     /* Gris clair pour les lignes de structure */
         }
 
         * {
@@ -22,10 +24,9 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Space Mono', monospace;
+            font-family: 'Inter', sans-serif; /* Base épurée et géométrique */
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
             min-height: 100vh;
             padding: 40px 20px;
             overflow-x: hidden;
@@ -36,66 +37,67 @@
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
         }
 
+        /* --- HEADER (Architectural) --- */
         header {
-            text-align: center;
-            margin-bottom: 20px;
+            border-bottom: 1px solid var(--text-color); /* Ligne de fondation */
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.2rem;
             font-weight: 400;
-            font-style: italic;
+            font-size: 1.6rem;
             line-height: 1.2;
-            letter-spacing: 1px;
+            letter-spacing: -0.04em; /* Typographie resserrée, très moderne */
+            margin-bottom: 8px;
         }
 
         .subtitle {
+            font-family: 'Space Mono', monospace; /* Touche Tech */
             font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-color);
-            margin-top: 15px;
+            color: var(--meta-color);
+            letter-spacing: 0.05em;
         }
 
+        /* --- INPUT ZONE (Nerd / Terminal Vibe) --- */
         .input-group {
-            position: relative;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 40px;
         }
 
-        .input-prefix {
-            position: absolute;
-            left: 0;
-            top: 15px;
-            color: var(--accent-color);
-            font-size: 0.9rem;
+        .terminal-box {
+            display: flex;
+            align-items: center;
+            background: #F8F8F8;
+            border: 1px solid var(--line-color);
+            padding: 12px 15px;
+        }
+
+        .prompt {
+            font-family: 'Space Mono', monospace;
+            color: var(--meta-color);
+            margin-right: 15px;
+            font-size: 0.85rem;
+            user-select: none;
         }
 
         input[type="text"] {
-            width: 100%;
+            flex: 1;
             background: transparent;
             border: none;
-            border-bottom: 1px solid var(--text-color);
-            padding: 15px 0 15px 25px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.9rem;
+            font-family: 'Space Mono', monospace; /* L'utilisateur tape du code/data */
+            font-size: 0.85rem;
             color: var(--text-color);
             outline: none;
-            border-radius: 0;
-            transition: border-color 0.3s;
         }
 
         input[type="text"]::placeholder {
-            color: #B0B0B0;
-        }
-
-        input[type="text"]:focus {
-            border-bottom: 2px solid var(--text-color);
+            color: #C0C0C0;
         }
 
         button {
@@ -103,104 +105,122 @@
             background: var(--text-color);
             color: var(--bg-color);
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
+            transition: background 0.2s;
         }
 
         button:active {
-            transform: scale(0.95);
+            background: var(--meta-color);
         }
 
+        /* --- FEEDBACK MESSAGE --- */
         #feedback-message {
             display: none;
-            text-align: center;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.4rem;
-            font-style: italic;
+            font-weight: 300;
+            font-style: italic; /* La seule touche romantique du design */
+            font-size: 1.1rem;
             color: var(--text-color);
-            padding: 20px 0;
+            text-align: center;
+            padding: 30px 0;
+            border: 1px dashed var(--line-color);
+            margin-bottom: 40px;
             animation: fadeInOut 3s forwards;
         }
 
+        /* --- LIST ZONE (Data Grid) --- */
         #list-container {
             display: none;
             flex-direction: column;
-            gap: 15px;
-            border-top: 1px dashed var(--accent-color);
-            padding-top: 30px;
         }
 
         .list-header {
+            font-family: 'Space Mono', monospace;
             font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-color);
+            letter-spacing: 1px;
+            color: var(--meta-color);
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 10px;
             margin-bottom: 10px;
         }
 
         .idea-item {
-            display: flex;
-            align-items: baseline;
-            gap: 15px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            animation: slideUp 0.4s ease-out;
+            display: grid;
+            grid-template-columns: 45px 1fr; /* Structure en grille stricte */
+            gap: 10px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--line-color);
+            animation: slideIn 0.3s ease-out;
         }
 
         .idea-index {
-            font-size: 0.7rem;
-            color: var(--accent-color);
-            min-width: 35px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--meta-color);
+            margin-top: 2px; /* Alignement optique avec le texte */
         }
 
+        .idea-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            font-weight: 300;
+        }
+
+        /* --- ANIMATIONS --- */
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(10px); }
-            15% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-10px); }
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- HEADER -->
         <header>
-            <h1>things to do between two Beautiful people</h1>
+            <h1>things to do between two beautiful people.</h1>
             <div class="subtitle">Dataset: Ideas & Memories</div>
         </header>
 
+        <!-- INPUT ZONE -->
         <div class="input-group" id="input-section">
-            <span class="input-prefix">&gt;</span>
-            <input type="text" id="idea-input" placeholder="insert an idea" autocomplete="off">
+            <div class="terminal-box">
+                <span class="prompt">~ %</span>
+                <input type="text" id="idea-input" placeholder="insert an idea" autocomplete="off">
+            </div>
             <button id="submit-btn">Append</button>
         </div>
 
+        <!-- FEEDBACK -->
         <div id="feedback-message"></div>
 
+        <!-- LIST ZONE -->
         <div id="list-container">
-            <div class="list-header">Current Database :</div>
+            <div class="list-header">Current Database_</div>
             <div id="ideas-list">
                 <!-- Les idées depuis Firebase apparaîtront ici -->
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK (Version Modulaire) -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Configuration Firebase propre
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAQ29umH4nAeAvykshEZ8No77OkQpIefZo",
             authDomain: "khushi-app-3d908.firebaseapp.com",
@@ -210,14 +230,14 @@
             appId: "1:684679928446:web:391d954452c89db681d62f"
         };
         
-        // Initialisation unique
+        // Initialisation
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const ideasCollection = collection(db, "ideas");
 
         const successMessages = [
-            "congratulations, another thing to do with your future partner",
-            "never we will be bored",
+            "congratulations, another thing to do with your future partner.",
+            "never we will be bored.",
             "great idea, nothing unexpected from someone like you :)"
         ];
 
