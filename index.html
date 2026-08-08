@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Things to do</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFCF8;
+            --text-color: #1A1A1A;
+            --accent-color: #9E9E9E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.2;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin-top: 15px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--text-color);
+            padding: 15px 0 15px 25px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            outline: none;
+            border-radius: 0;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]::placeholder {
+            color: #B0B0B0;
+        }
+
+        input[type="text"]:focus {
+            border-bottom: 2px solid var(--text-color);
+        }
+
+        button {
+            align-self: flex-end;
+            background: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #feedback-message {
+            display: none;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--text-color);
+            padding: 20px 0;
+            animation: fadeInOut 3s forwards;
+        }
+
+        #list-container {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            border-top: 1px dashed var(--accent-color);
+            padding-top: 30px;
+        }
+
+        .list-header {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .idea-item {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .idea-index {
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            min-width: 35px;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>things to do between two Beautiful people</h1>
+            <div class="subtitle">Dataset: Ideas & Memories</div>
+        </header>
+
+        <div class="input-group" id="input-section">
+            <span class="input-prefix">&gt;</span>
+            <input type="text" id="idea-input" placeholder="insert an idea" autocomplete="off">
+            <button id="submit-btn">Append</button>
+        </div>
+
+        <div id="feedback-message"></div>
+
+        <div id="list-container">
+            <div class="list-header">Current Database :</div>
+            <div id="ideas-list">
+                <!-- Les idées depuis Firebase apparaîtront ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Version Modulaire) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // ==========================================
+        // ⚠️ REMPLACE CECI PAR TA CONFIGURATION FIREBASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "TON_API_KEY",
+            authDomain: "TON_PROJET.firebaseapp.com",
+            projectId: "TON_PROJET",
+            storageBucket: "TON_PROJET.appspot.com",
+            messagingSenderId: "TON_SENDER_ID",
+            appId: "TON_APP_ID"
+        };
+
+        // Initialisation
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const ideasCollection = collection(db, "ideas");
+
+        const successMessages = [
+            "congratulations, another thing to do with your future partner",
+            "never we will be bored",
+            "great idea, nothing unexpected from someone like you :)"
+        ];
+
+        // Écoute en temps réel de la base de données
+        const q = query(ideasCollection, orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const listEl = document.getElementById('ideas-list');
+            listEl.innerHTML = ""; // Vider la liste avant de la reconstruire
+            
+            const totalDocs = snapshot.docs.length;
+
+            if (totalDocs > 0) {
+                document.getElementById('list-container').style.display = 'flex';
+                
+                snapshot.forEach((doc, index) => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'idea-item';
+                    
+                    // Formatage de l'index façon code [00]
+                    const formattedIndex = String(totalDocs - index - 1).padStart(2, '0');
+                    
+                    item.innerHTML = `
+                        <span class="idea-index">[${formattedIndex}]</span>
+                        <span class="idea-text">${data.text}</span>
+                    `;
+                    listEl.appendChild(item);
+                });
+            }
+        });
+
+        // Gérer l'ajout d'une idée
+        async function submitIdea() {
+            const inputEl = document.getElementById('idea-input');
+            const ideaText = inputEl.value.trim();
+
+            if (ideaText === "") return;
+
+            // Masquer l'input
+            inputEl.value = "";
+            document.getElementById('input-section').style.display = 'none';
+
+            // Ajouter à Firebase
+            try {
+                await addDoc(ideasCollection, {
+                    text: ideaText,
+                    createdAt: serverTimestamp()
+                });
+            } catch (e) {
+                console.error("Erreur lors de l'ajout : ", e);
+            }
+
+            // Afficher le message romantique
+            const feedbackEl = document.getElementById('feedback-message');
+            const randomMsg = successMessages[Math.floor(Math.random() * successMessages.length)];
+            
+            feedbackEl.innerText = randomMsg;
+            feedbackEl.style.display = 'block';
+
+            // Réafficher l'input après 3 secondes
+            setTimeout(() => {
+                feedbackEl.style.display = 'none';
+                document.getElementById('input-section').style.display = 'flex';
+            }, 3000);
+        }
+
+        // Écouteurs d'événements
+        document.getElementById('submit-btn').addEventListener('click', submitIdea);
+        document.getElementById('idea-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') submitIdea();
+        });
+    </script>
+</body>
+</html>
