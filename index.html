@@ -200,19 +200,17 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // ==========================================
-        // ⚠️ REMPLACE CECI PAR TA CONFIGURATION FIREBASE
-        // ==========================================
+        // Configuration Firebase propre
         const firebaseConfig = {
-            apiKey: "TON_API_KEY",
-            authDomain: "TON_PROJET.firebaseapp.com",
-            projectId: "TON_PROJET",
-            storageBucket: "TON_PROJET.appspot.com",
-            messagingSenderId: "TON_SENDER_ID",
-            appId: "TON_APP_ID"
+            apiKey: "AIzaSyAQ29umH4nAeAvykshEZ8No77OkQpIefZo",
+            authDomain: "khushi-app-3d908.firebaseapp.com",
+            projectId: "khushi-app-3d908",
+            storageBucket: "khushi-app-3d908.firebasestorage.app",
+            messagingSenderId: "684679928446",
+            appId: "1:684679928446:web:391d954452c89db681d62f"
         };
-
-        // Initialisation
+        
+        // Initialisation unique
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const ideasCollection = collection(db, "ideas");
@@ -227,7 +225,7 @@
         const q = query(ideasCollection, orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             const listEl = document.getElementById('ideas-list');
-            listEl.innerHTML = ""; // Vider la liste avant de la reconstruire
+            listEl.innerHTML = "";
             
             const totalDocs = snapshot.docs.length;
 
@@ -239,7 +237,6 @@
                     const item = document.createElement('div');
                     item.className = 'idea-item';
                     
-                    // Formatage de l'index façon code [00]
                     const formattedIndex = String(totalDocs - index - 1).padStart(2, '0');
                     
                     item.innerHTML = `
@@ -258,11 +255,9 @@
 
             if (ideaText === "") return;
 
-            // Masquer l'input
             inputEl.value = "";
             document.getElementById('input-section').style.display = 'none';
 
-            // Ajouter à Firebase
             try {
                 await addDoc(ideasCollection, {
                     text: ideaText,
@@ -272,21 +267,18 @@
                 console.error("Erreur lors de l'ajout : ", e);
             }
 
-            // Afficher le message romantique
             const feedbackEl = document.getElementById('feedback-message');
             const randomMsg = successMessages[Math.floor(Math.random() * successMessages.length)];
             
             feedbackEl.innerText = randomMsg;
             feedbackEl.style.display = 'block';
 
-            // Réafficher l'input après 3 secondes
             setTimeout(() => {
                 feedbackEl.style.display = 'none';
                 document.getElementById('input-section').style.display = 'flex';
             }, 3000);
         }
 
-        // Écouteurs d'événements
         document.getElementById('submit-btn').addEventListener('click', submitIdea);
         document.getElementById('idea-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') submitIdea();
